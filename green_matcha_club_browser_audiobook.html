@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Green Matcha Club Audiobook Player</title>
+  <style>
+    :root { --green:#1e5d39; --cream:#fcfaf2; --ink:#153125; --gold:#c89f4a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:Georgia,serif; color:var(--ink); background:linear-gradient(135deg,#e8f1df,var(--cream)); }
+    main { max-width:900px; margin:auto; padding:52px 24px; }
+    .card { background:#fffdf8; border:1px solid #d8e2cf; border-radius:20px; padding:32px; box-shadow:0 14px 36px #24422b18; }
+    h1 { margin:0; color:var(--green); font-size:clamp(2rem,5vw,3.5rem); }
+    h2 { color:var(--green); margin:30px 0 8px; }
+    .eyebrow { color:var(--gold); font:700 .78rem/1.2 Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase; }
+    .intro { font-size:1.12rem; line-height:1.65; max-width:680px; }
+    label { display:block; font:700 .82rem Arial,sans-serif; letter-spacing:.06em; margin:18px 0 7px; text-transform:uppercase; }
+    select, input[type=range], button { width:100%; }
+    select { padding:12px; border:1px solid #bed0b8; border-radius:9px; background:white; font:1rem Arial,sans-serif; }
+    .controls { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:24px 0 12px; }
+    button { cursor:pointer; border:0; border-radius:9px; padding:13px 12px; color:white; background:var(--green); font:700 1rem Arial,sans-serif; }
+    button.secondary { background:#557362; } button.stop { background:#8a503d; }
+    .value { color:var(--green); font:700 1rem Arial,sans-serif; }
+    .chapter { padding:20px 0; border-top:1px solid #dce6d7; }
+    .chapter p { white-space:pre-line; line-height:1.68; font-size:1.06rem; }
+    .status { background:#edf5e8; border-radius:8px; padding:12px; font:0.95rem Arial,sans-serif; }
+    small { display:block; margin-top:18px; font:0.9rem/1.5 Arial,sans-serif; color:#53685d; }
+  </style>
+</head>
+<body>
+  <main><div class="card">
+    <div class="eyebrow">Green Matcha Club</div>
+    <h1>Matcha Foundations</h1>
+    <p class="intro">A browser-voice audiobook. Select a Google voice if Chrome offers one, choose your pace, then listen chapter by chapter.</p>
+
+    <label for="voice">Narrator voice</label><select id="voice"><option>Loading available voices…</option></select>
+    <label for="rate">Narration speed: <span class="value" id="rateValue">0.9×</span></label><input id="rate" type="range" min="0.7" max="1.2" value="0.9" step="0.05">
+    <div class="controls"><button id="play">Play chapter</button><button class="secondary" id="pause">Pause / resume</button><button class="stop" id="stop">Stop</button></div>
+    <p class="status" id="status" aria-live="polite">Choose a chapter below, then press Play chapter.</p>
+
+    <section id="chapters"></section>
+    <small>Google-branded voices appear only if they are installed or available in your Chrome/Edge browser. This uses the browser’s Speech Synthesis feature and plays audio live; it does not create an MP3 download.</small>
+  </div></main>
+
+  <script>
+    const chapters = [
+      ["Opening", `Welcome to Green Matcha Club—a place for slowing down, learning something useful, and enjoying matcha in a way that fits real life. Whether you are holding your first tin of bright green powder, trying to make a café-style latte at home, or simply curious about matcha, you are in the right place. In this audiobook, we will explore what matcha is, where it comes from, how to choose it, and how to prepare it with confidence. There is no test and no need to rush. One cup at a time, you can create a ritual that feels like your own.`],
+      ["Chapter 1 — What Is Matcha Tea?", `Matcha is a finely ground green tea powder made from specially grown tea leaves. Unlike ordinary loose-leaf tea, where leaves are steeped and then removed, matcha is whisked into water and consumed as part of the drink itself. Good matcha may taste fresh, gently grassy, savoury, and softly sweet. Water temperature, freshness, quality, and technique all shape the final cup. Traditionally, matcha is prepared in a bowl with hot—not boiling—water and a bamboo whisk. Today it also belongs in iced drinks, lattes, smoothies, cakes, and desserts.`],
+      ["Chapter 2 — A Short History of Matcha", `The story of powdered tea reaches back to China, where tea was sometimes prepared in ground form centuries ago. The practice travelled to Japan, where it developed into the matcha tradition known today. Preparing matcha became more than a way to drink tea. It became a considered practice shaped by attention, hospitality, and calm. Today, matcha moves easily between old and new worlds: a quiet bowl, an iced latte on a warm afternoon, or a dessert shared with friends.`],
+      ["Chapter 3 — Matcha and Everyday Wellbeing", `Many people choose matcha because it feels like a steadier alternative to their usual morning drink. Matcha naturally contains caffeine and L-theanine. Individual experiences vary, but some people find the combination calm and alert. Keep the promise realistic: matcha is not a magic cure, a replacement for sleep, or a substitute for medical care. It can be a satisfying part of a balanced lifestyle. If you are sensitive to caffeine, pregnant, take medication, or have a health condition, seek personal advice from a qualified clinician.`],
+      ["Chapter 4 — Choosing the Right Powder", `Start with the use you have in mind. If you want to drink matcha simply with water, choose a fresh powder with an inviting green colour and a flavour you enjoy. If you plan to blend it with milk, fruit, chocolate, or bake with it, a more robust option may be a better fit. Freshness matters: store the powder sealed in a cool, dark place. The best matcha is not automatically the most expensive one. It is the one that suits the drink or recipe you want to make.`],
+      ["Chapter 5 — Ceremonial and Culinary Matcha", `Ceremonial grade matcha is usually chosen for drinking with water, where its smoother, more delicate flavour can be appreciated. Culinary grade matcha is designed to hold its character when paired with milk or other ingredients. In a latte, smoothie, cake, cookie, or cream filling, that stronger profile can be exactly what you need. Neither is a lesser choice. They simply have different jobs.`],
+      ["Chapter 6 — Water Temperature", `The most common mistake with matcha is using water that is too hot. Boiling water can make the drink taste more bitter and hide its rounded notes. For a balanced bowl, use water that has cooled slightly after boiling—often around seventy to eighty degrees Celsius. Add a small amount first to make a smooth paste, then add the remaining water and whisk. If the drink tastes too bitter, try cooler water next time.`],
+      ["Chapter 7 — Whisking Smoothly", `Sift your matcha into a bowl if you can. Add a small splash of warm water and make a smooth paste. Then add the remaining water. Whisk quickly with a light back-and-forth motion, like making a gentle letter M or W. You are looking for a smooth texture and a light layer of foam. A traditional bamboo whisk is lovely, but it is not essential. A small kitchen whisk or milk frother can help you get started.`],
+      ["Chapter 8 — The Everyday Matcha Latte", `A matcha latte begins with a smooth matcha base: powder, a little warm water, and a whisk. Then add warm or cold milk—dairy or plant-based—and sweeten only if you enjoy it. For an iced latte, make the matcha concentrate first, then pour it over ice and milk. Start simple, then adjust one element at a time. The aim is a drink that makes your day feel a little better—not one more complicated task.`],
+      ["Chapter 9 — How Much Matcha Per Day?", `For many adults, one serving of matcha a day is a comfortable place to start. Caffeine sensitivity varies widely. Pay attention to your signals: if matcha affects sleep or makes you feel restless, reduce the amount or drink it earlier in the day. Be careful with caffeine from several sources at once. There is no single correct matcha routine—only the one that is enjoyable, sustainable, and right for you.`],
+      ["Closing", `You now have the essentials: what matcha is, how it became part of tea culture, how to choose it, how to prepare it, and how to make it a thoughtful part of your day. Start with one small ritual. Choose your powder. Use water that is not too hot. Whisk with a little patience. Taste, notice, and make one adjustment next time. Thank you for listening to Green Matcha Club: Matcha Foundations.`]
+    ];
+    let active = 0, voices = [], speaking = false;
+    const voiceSelect = document.querySelector('#voice'), status = document.querySelector('#status');
+    const chapterWrap = document.querySelector('#chapters');
+    chapters.forEach(([title, text], index) => {
+      const item = document.createElement('article'); item.className = 'chapter';
+      item.innerHTML = `<h2>${title}</h2><p>${text}</p><button data-index="${index}">Listen to this chapter</button>`;
+      item.querySelector('button').onclick = () => { active = index; speak(); };
+      chapterWrap.appendChild(item);
+    });
+    function loadVoices() {
+      voices = speechSynthesis.getVoices(); voiceSelect.innerHTML = '';
+      voices.forEach((voice, i) => { const o = new Option(`${voice.name} — ${voice.lang}`, i); if (/google.*english/i.test(voice.name)) o.selected = true; voiceSelect.add(o); });
+      if (!voices.length) voiceSelect.innerHTML = '<option>Voice list is not ready—wait a moment and refresh.</option>';
+    }
+    function speak() {
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(chapters[active][1]);
+      utterance.rate = Number(document.querySelector('#rate').value);
+      utterance.voice = voices[Number(voiceSelect.value)] || null;
+      utterance.onstart = () => { speaking = true; status.textContent = `Playing: ${chapters[active][0]}`; };
+      utterance.onend = () => { speaking = false; status.textContent = `Finished: ${chapters[active][0]}`; };
+      utterance.onerror = () => { speaking = false; status.textContent = 'Playback stopped. Please try again.'; };
+      speechSynthesis.speak(utterance);
+    }
+    document.querySelector('#play').onclick = speak;
+    document.querySelector('#pause').onclick = () => { if (speaking && !speechSynthesis.paused) speechSynthesis.pause(); else speechSynthesis.resume(); };
+    document.querySelector('#stop').onclick = () => { speechSynthesis.cancel(); speaking = false; status.textContent = 'Playback stopped.'; };
+    document.querySelector('#rate').oninput = e => document.querySelector('#rateValue').textContent = `${e.target.value}×`;
+    speechSynthesis.onvoiceschanged = loadVoices; loadVoices();
+  </script>
+</body>
+</html>
